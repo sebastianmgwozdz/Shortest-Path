@@ -5,19 +5,26 @@ import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class Square extends Rectangle {
     private double distFromPrev;
+    private Square previous;
     private HashSet<Square> neighbors;
 
     public Square(int x, int y, int width, int height) {
         super(x, y, width, height);
         super.setFill(Color.web("#CCD1D1"));
-        this.distFromPrev = 10000;
+        this.distFromPrev = 1000000;
+    }
+
+    public void setPrevious(Square s) {
+        this.previous = s;
+    }
+
+    public Square getPrevious() {
+        return this.previous;
     }
 
     public void setDistFromPrev(double distance) {
@@ -92,12 +99,16 @@ public class Square extends Rectangle {
 
     private void fillDefault(HashMap<Integer, Integer> coordinates, Mode mode) {
         Square.super.setFill(mode.getColor());
-        coordinates.put((int) Square.super.getX(), (int) Square.super.getY());
+        if (coordinates != null) {
+            coordinates.put((int) Square.super.getX(), (int) Square.super.getY());
+        }
     }
 
     private void reset(HashMap<Integer, Integer> coordinates) {
         super.setFill(Color.web("#CCD1D1"));
-        coordinates.remove((int) Square.super.getX());
+        if (coordinates != null) {
+            coordinates.remove((int) Square.super.getX());
+        }
     }
 
 
