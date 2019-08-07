@@ -18,10 +18,14 @@ import java.util.Set;
 
 public class App extends Application {
     private final Set<KeyCode> pressedKeys = new HashSet<>();
-    private boolean allowDiagonal = false;
+    private boolean allowDiagonal;
 
     void setAllowDiagonal(boolean b) {
         allowDiagonal = b;
+    }
+
+    boolean getAllowDiagonal() {
+        return allowDiagonal;
     }
 
     public static void main(String[] args) {
@@ -35,6 +39,7 @@ public class App extends Application {
     }
 
     void runApp(Stage stage) {
+        allowDiagonal = false;
         Scene sc = getScene(stage);
 
         stage.setScene(sc);
@@ -113,7 +118,7 @@ public class App extends Application {
                             Square beginning = b.getValues()[(int) start.values().toArray()[0]][(int) start.keySet().toArray()[0]];
                             Square ending = b.getValues()[(int) end.values().toArray()[0]][(int) end.keySet().toArray()[0]];
 
-                            pf.run(beginning, ending);
+                            pf.run(beginning, ending, this);
 
                             b.setMode(Mode.DONE, null);
                         }

@@ -11,26 +11,28 @@ import java.util.*;
 
 // Used to find the shortest path and draw it
 class Pathfinder {
-    private Square[][] board;
+    private Board board;
 
     Pathfinder(Board board) {
-        this.board = board.getValues();
+        this.board = board;
 
     }
 
     // Main algorithm (Dijkstra / A*), finds shortest distance from starting point to every node it checks
-    void run(Square start, Square end) {
+    void run(Square start, Square end, App app) {
         LinkedHashSet<Square> path = new LinkedHashSet<>();
         HashSet<Square> notVisited = new HashSet<>();
         HashSet<Square> visited = new HashSet<>();
 
+        Square[][] values = board.getValues();
+
         // Add each square to notVisited set
-        for (Square[] squares : board) {
-            notVisited.addAll(Arrays.asList(squares).subList(0, board[0].length));
+        for (Square[] squares : values) {
+            notVisited.addAll(Arrays.asList(squares).subList(0, values[0].length));
         }
 
         // Begin with starting point, tentative distance = 0
-        Square current = board[(int) start.getY()][(int) start.getX()];
+        Square current = values[(int) start.getY()][(int) start.getX()];
         current.setDistFromPrev(0);
         current.setPrevious(null);
 
@@ -40,7 +42,7 @@ class Pathfinder {
             visited.add(current);
 
             // Check if destination has been reached
-            if (!notVisited.contains(end)) {
+            if (visited.contains(end)) {
                 break;
             }
 
@@ -52,13 +54,13 @@ class Pathfinder {
             // Update tentative distances of all the current node's neighbors
             for (Square neighbor : current.getNeighbors()) {
                 // Only update if the new distance is less than the old
-                if (current.getDistFromPrev() + getCost(neighbor, end) < neighbor.getDistFromPrev() && notVisited.contains(neighbor)) {
-                    neighbor.setDistFromPrev(current.getDistFromPrev() + getCost(neighbor, end));
+                if (current.getDistFromPrev() + 1 + getCost(neighbor, end, app) < neighbor.getDistFromPrev() && notVisited.contains(neighbor)) {
+                    neighbor.setDistFromPrev(current.getDistFromPrev() + 1 + getCost(neighbor, end, app));
                     // Update the shortest path
                     neighbor.setPrevious(current);
                 }
                 // Add the checked nodes to the set
-                if (!neighbor.getFill().equals(Mode.SETTING_OBSTACLE.getColor()) || neighbor.equals(end)) {
+                if (!neighbor.getFill().equals(Mode.SETTING_OBSTACLE.getColor())) {
                     path.add(neighbor);
                 }
             }
@@ -70,10 +72,20 @@ class Pathfinder {
     }
 
     // Calculates the cost of the node, determined by the euclidean distance between the given node and the destination
-    private double getCost(Square neighbor, Square goal) {
-        double xDiff = Math.abs(goal.getX() - neighbor.getX());
-        double yDiff = Math.abs(goal.getY()- neighbor.getY());
-        return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+    // if diagonal is not allowed, and determined by diagonal distance if allowed.
+    private double getCost(Square neighbor, Square goal, App app) {
+        // Calculates diagonal distance
+        if (app.getAllowDiagonal()) {
+            double xDiff = Math.abs(goal.getX() - neighbor.getX());
+            double yDiff = Math.abs(goal.getY() - neighbor.getY());
+            return Math.max(xDiff, yDiff);
+        }
+        // Calculates manhattan distance
+        else {
+            double xDiff = Math.abs(goal.getX() - neighbor.getX());
+            double yDiff = Math.abs(goal.getY() - neighbor.getY());
+            return xDiff + yDiff;
+        }
     }
 
     // Returns the unvisited neighboring square with the smallest tentative distance (After recalculating)

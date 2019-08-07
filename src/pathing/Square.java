@@ -18,7 +18,7 @@ class Square extends Rectangle {
         super.setFill(Color.web("#CCD1D1"));
 
         // Initialize tentative distance to a high number for the pathfinding algorithm to work
-        this.distFromPrev = 1000000;
+        this.distFromPrev = 2147483645;
     }
 
     void setPrevious(Square s) {
